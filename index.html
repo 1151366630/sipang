@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>羽毛球计分器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            touch-action: manipulation;
+        }
+        
+        .score-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 15vw;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+        
+        .red-area {
+            background-color: #e74c3c;
+        }
+        
+        .blue-area {
+            background-color: #3498db;
+        }
+        
+        .score-area:active {
+            opacity: 0.8;
+        }
+        
+        .reset-button {
+            position: fixed;
+            bottom: 50%;
+            left: 50%;
+            transform: translate(-50%, 50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        
+        .reset-button:active {
+            transform: translate(-50%, 50%) scale(0.95);
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 适配不同设备 */
+        @media (max-width: 320px) {
+            /* 小型手机和Apple Watch */
+            .score-area {
+                font-size: 20vw;
+            }
+            
+            .reset-button {
+                width: 40px;
+                height: 40px;
+                font-size: 12px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            /* 平板和桌面 */
+            .score-area {
+                font-size: 12vw;
+            }
+            
+            .reset-button {
+                width: 80px;
+                height: 80px;
+                font-size: 16px;
+            }
+        }
+        
+        /* Apple Watch 特别适配 */
+        @media (max-width: 272px) {
+            .score-area {
+                font-size: 24vw;
+            }
+            
+            .reset-button {
+                width: 30px;
+                height: 30px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="score-area red-area" id="redArea">0</div>
+    <div class="score-area blue-area" id="blueArea">0</div>
+    <button class="reset-button" id="resetButton">清零</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const redArea = document.getElementById('redArea');
+            const blueArea = document.getElementById('blueArea');
+            const resetButton = document.getElementById('resetButton');
+            
+            let redScore = 0;
+            let blueScore = 0;
+            
+            // 更新分数显示
+            function updateScores() {
+                redArea.textContent = redScore;
+                blueArea.textContent = blueScore;
+                
+                // 保存到本地存储
+                localStorage.setItem('badmintonScores', JSON.stringify({
+                    red: redScore,
+                    blue: blueScore
+                }));
+            }
+            
+            // 从本地存储加载分数
+            function loadScores() {
+                const savedScores = localStorage.getItem('badmintonScores');
+                if (savedScores) {
+                    const scores = JSON.parse(savedScores);
+                    redScore = scores.red;
+                    blueScore = scores.blue;
+                    updateScores();
+                }
+            }
+            
+            // 初始加载分数
+            loadScores();
+            
+            // 点击红色区域增加分数
+            redArea.addEventListener('click', function() {
+                redScore++;
+                updateScores();
+            });
+            
+            // 点击蓝色区域增加分数
+            blueArea.addEventListener('click', function() {
+                blueScore++;
+                updateScores();
+            });
+            
+            // 点击重置按钮
+            resetButton.addEventListener('click', function() {
+                redScore = 0;
+                blueScore = 0;
+                updateScores();
+            });
+            
+            // 防止滚动和缩放
+            document.addEventListener('touchmove', function(e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            // 防止双击缩放
+            document.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+            });
+        });
+    </script>
+</body>
+</html>
